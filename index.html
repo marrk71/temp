@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>溫度波型</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <canvas id="tempChart" width="400" height="300"></canvas>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const field = urlParams.get('field') || 2; // 預設 C 欄
+    const apiUrl = `https://script.google.com/macros/s/AKfycbz5qjDK_G2LZc115GDH5tz0uzda8ZM1WFFoJeLfxZakuRfSzf6GpxRy_xoPA8ut8iOP/exec?field=${field}`;
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(item => item.datetime);
+        const values = data.map(item => parseFloat(item.value)).filter(v => !isNaN(v));
+
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: `溫度欄位 ${String.fromCharCode(65 + parseInt(field))}`,
+              data: values,
+              borderWidth: 2,
+              fill: false,
+              tension: 0.2
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: false }
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
