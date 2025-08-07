@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>指定時間溫度波型</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>溫度波型圖</h2>
+  <canvas id="tempChart" width="600" height="400"></canvas>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const date = urlParams.get('date') || '2025/08/07'; // 預設日期
+    const hour = urlParams.get('hour') || '10';         // 預設小時
+    const field = urlParams.get('field') || 2;          // 預設欄位 index = 2 (C欄)
+
+    // ✅ 按照順序：date → hour → field
+    const apiUrl = `https://script.google.com/macros/s/AKfycbxJSrxk-SocvlfQekNHAnkhEZDevWduWlracF2ZWvQ76MG7qkTNenJ9302y4EeQUF0d/exec?date=${encodeURIComponent(date)}&hour=${hour}&field=${field}`;
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const labels = data.map(item => item.time);
+        const values = data.map(item => {
+          const v = parseFloat(item.value);
+          return isNaN(v) ? null : v;  // 使用 null 斷開波型
+        });
+
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: `欄位 ${String.fromCharCode(65 + parseInt(field))} 的溫度`,
+              data: values,
+              borderColor: 'blue',
+              backgroundColor: 'lightblue',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: false,
+              spanGaps: false
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: `${date} ${hour}:00 的資料`,
+                font: { size: 16 }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                title: { display: true, text: '溫度' }
+              },
+              x: {
+                title: { display: true, text: '時間' }
+              }
+            }
+          }
+        });
+      })
+      .catch(err => {
+        console.error('資料讀取失敗', err);
+        alert("載入資料失敗，請確認網址參數是否正確！");
+      });
+  </script>
+</body>
+</html>
