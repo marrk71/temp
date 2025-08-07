@@ -16,7 +16,7 @@
     const field = urlParams.get('field') || 2;          // 預設欄位 index = 2 (C欄)
 
     // ✅ 按照順序：date → hour → field
-    const apiUrl = `https://script.google.com/macros/s/AKfycbxJSrxk-SocvlfQekNHAnkhEZDevWduWlracF2ZWvQ76MG7qkTNenJ9302y4EeQUF0d/exec?date=${encodeURIComponent(date)}&hour=${hour}&field=${field}`;
+    const apiUrl = `https://script.google.com/macros/s/AKfycbxh7Yb-BmYR5yvmjd8wwIpS6_TLHK6CHgtl_tBJdHMR3rawz5zhhSVFOFcmH-tl36RW/exec?date=${encodeURIComponent(date)}&hour=${hour}&field=${field}`;
 
     fetch(apiUrl)
       .then(res => res.json())
