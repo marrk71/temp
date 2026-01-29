@@ -20,7 +20,8 @@
 
     const apiUrl =
       `https://script.google.com/macros/s/AKfycbzZ8XOSjZz9PHtu6ssjjargOropRhM_3H29gbHjDDxnlAhsbz-Q7pcyOjyvnPNeOfYaww/exec`
-      + `?sheet=${encodeURIComponent(sheet)}`
+      + `?action=query`
+      + `&sheet=${encodeURIComponent(sheet)}`
       + `&date=${encodeURIComponent(date)}`
       + `&hour=${hour}`
       + `&field=${field}`;
