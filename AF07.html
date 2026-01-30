@@ -1,1 +1,75 @@
 
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>指定時間溫度波型</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>溫度波型圖</h2>
+  <canvas id="tempChart" width="600" height="400"></canvas>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const sheet = urlParams.get('sheet') || 'Sheet1';
+    const date  = urlParams.get('date')  || '2025/08/07';
+    const hour  = urlParams.get('hour')  || '10';
+    const field = urlParams.get('field') || 2;
+
+    const apiUrl =
+      `https://script.google.com/macros/s/AKfycby3UR44YIi336urJRzN1j6U9FhVOkqbHTy_Vkmf-45dGWr7g0D7h-u-LSVjCN2v5BRt/exec`
+      + `?action=query`
+      + `&sheet=${encodeURIComponent(sheet)}`
+      + `&date=${encodeURIComponent(date)}`
+      + `&hour=${hour}`
+      + `&field=${field}`;
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+
+        const labels = data.map(item => item.time);
+        const values = data.map(item => {
+          const v = parseFloat(item.value);
+          return isNaN(v) ? null : v;   // --- 斷線
+        });
+
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: `${sheet}｜欄位 ${String.fromCharCode(65 + parseInt(field))}`,
+              data: values,
+              borderWidth: 2,
+              tension: 0.3,
+              fill: false,
+              spanGaps: false
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: `${sheet}｜${date} ${hour}:00`
+              }
+            },
+            scales: {
+              y: { beginAtZero: false },
+              x: { title: { display: true, text: '時間' } }
+            }
+          }
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        alert("資料讀取失敗");
+      });
+  </script>
+</body>
+</html>
